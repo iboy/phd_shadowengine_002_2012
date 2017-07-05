@@ -6,4 +6,4 @@ Features: Multipart, jointed 3D figures. Testing touch puppetry controls and fig
 
 Figures: Karaghiozis, Reiniger's horse, Reiniger's female figure. Wayang.
 
-![iPad prototype](screenshot.png)
+![screenshot](screenshot.png)
