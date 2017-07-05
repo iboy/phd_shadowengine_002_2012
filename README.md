@@ -6,4 +6,4 @@ Features: Multipart, jointed 3D figures. Testing touch puppetry controls and fig
 
 Figures: Karaghiozis, Reiniger's horse, Reiniger's female figure. Wayang.
 
-![iPad prototype](https://github.com/iboy/phd_shadowengine_002_2012/Assets/Screenshots/ShadowEngine_001_horse_touch.png)
+![iPad prototype](https://github.com/iboy/phd_shadowengine_002_2012/Assets/Screenshots/ShadowEngine_001_horse_touch.png?raw=true)
