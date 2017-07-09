@@ -8,7 +8,11 @@ public class ToggleMaterial : MonoBehaviour {
 	public Color32 defaultTintColor = Color.white;
 	public Color32 targetTintColor = Color.black;
 	private Renderer rend;
-	public Camera mainCamera;
+	public Camera mainCamera; // orthographc
+	public Camera perspectiveCamera;
+	public KeyCode silhouetteMode = KeyCode.Z;
+	public KeyCode defaultMaterialMode = KeyCode.X;
+	public KeyCode grayscaleMode = KeyCode.C;
 
 	//private bool spaceToggle = false;
 
@@ -21,12 +25,12 @@ public class ToggleMaterial : MonoBehaviour {
 		//
 		//}
 
-
+	
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.Z)) {
+		if (Input.GetKeyDown(silhouetteMode)) {
 
 				foreach (GameObject go in gameObjectsToToggle) {
 					SetMaterialToBlack(go);
@@ -35,7 +39,7 @@ public class ToggleMaterial : MonoBehaviour {
 
 		}
 			
-		if (Input.GetKeyDown(KeyCode.X)) {
+		if (Input.GetKeyDown(defaultMaterialMode)) {
 
 			foreach (GameObject go in gameObjectsToToggle) {
 				SetMaterialToDefault(go);
@@ -44,11 +48,14 @@ public class ToggleMaterial : MonoBehaviour {
 
 		}
 
-		if (Input.GetKeyDown(KeyCode.C)) {
+		if (Input.GetKeyDown(grayscaleMode)) {
 
 			if (mainCamera != null) {
 				GrayscaleEffect gs = mainCamera.GetComponent<GrayscaleEffect>();
 				gs.enabled = !gs.enabled;
+
+				GrayscaleEffect gsp = perspectiveCamera.GetComponent<GrayscaleEffect>();
+				gsp.enabled = !gsp.enabled;
 
 			}
 			
