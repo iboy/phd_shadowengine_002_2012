@@ -13,7 +13,8 @@ Figures: Karaghiozis; a Reiniger horse; a Reiniger female figure; Wayang Kulit.
 * Multi-touch puppetry controls;
 * Tests different approaches to figure assembly;
 * Key bindings to experiment with angular constraints of root objects.
-* Visual design changes
+* Visual design: whole screen blur, vignetting, chromatic aberration, depth-of-field;
+* Figure material settings (colour, grayscale, silhouette);
 
 
 ---- 
@@ -35,7 +36,7 @@ Change-log ShadowEngine 002
 
 (4) For demonstration purposes added 'Camera Switcher', to toggle between 'Orthographic' and 'Perspective' camera types (key-bindings: <kbd>P</kbd>).
 
-(5) For demonstration purposes added a keyboard utility to change at run-time 'Configurable Joint' settings: set angular limits on <kbd>X</kbd>, <kbd>Y</kbd> and <kbd>Z</kbd>. (default key-bindings: <kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd>). Tweaking the 'angular motion limits' significantly changes the animatable and physics driven behaviours of the figures. The default settings for the main body part of the Karaghiozis figure's configurable joint's angular motion (per axis <kbd>XYZ</kbd>) is 'locked', 'limited', 'locked'. This stops angular motion around the <kbd>X</kbd> and <kbd>Z</kbd> axis - note he doesn't bend at the waist and the piece is always upright. 'limited', 'limited', 'locked', with no angular constraint on <kbd>Y</kbd> - lets the figure rotate on the <kbd>Y</kbd> axis (flipping) using friction and momentum. Free, locked, locked - lets the figure somersault around.
+(5) For demonstration purposes added a keyboard utility to change at run-time 'Configurable Joint' settings: set angular limits on X, Y and Z. (default key-bindings: <kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd>). Tweaking the 'angular motion limits' significantly changes the animatable and physics driven behaviours of the figures. The default settings for the main body part of the Karaghiozis figure's configurable joint's angular motion (per axis XYZ) is 'locked', 'limited', 'locked'. This stops angular motion around the X and Z axis - note he doesn't bend at the waist and the piece is always upright. 'limited', 'limited', 'locked', with no angular constraint on Y - lets the figure rotate on the Y axis (flipping) using friction and momentum. Free, locked, locked - lets the figure somersault around.
 
 The Wayang Kulit needs the following setting: Limited (-10,10), free, locked. 
 
@@ -44,3 +45,4 @@ The Wayang Kulit needs the following setting: Limited (-10,10), free, locked.
 ----
 To do
 ----
+(1) Fix the sorting / depth-fighting issues: in the figures, with the screen 'frame.

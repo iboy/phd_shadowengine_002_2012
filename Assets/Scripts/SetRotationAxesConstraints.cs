@@ -3,14 +3,14 @@ using System.Collections;
 
 public class SetRotationAxesConstraints : MonoBehaviour {
 	
-	public Rigidbody rigidbody; // there should only be one configurable joint for this script
+	public Rigidbody _rigidbody; // there should only be one configurable joint for this script
 	
 	public KeyCode keyXRotationConstraint = KeyCode.Alpha1;
 	public KeyCode keyYRotationConstraint = KeyCode.Alpha2;
 	public KeyCode keyZRotationConstraint = KeyCode.Alpha3;
 	public KeyCode keyResetRotationConstraint = KeyCode.Alpha4;
 
-	private RigidbodyConstraints originalConstraints;
+//	private RigidbodyConstraints originalConstraints;
 
 	private int pressCount1;
 	private int pressCount2;
@@ -21,7 +21,7 @@ public class SetRotationAxesConstraints : MonoBehaviour {
 		pressCount1 = 0;
 		pressCount2 = 0;
 		pressCount3 = 0;
-		originalConstraints = rigidbody.constraints;
+//		originalConstraints = rigidbody.constraints;
 	}
 	
 	// Update is called once per frame
@@ -32,16 +32,16 @@ public class SetRotationAxesConstraints : MonoBehaviour {
 			rigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
 
 			 if (pressCount1 == 0) {
-				originalConstraints = rigidbody.constraints;
+//				originalConstraints = rigidbody.constraints;
 				//rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
 				pressCount1++;
 			} else {
 
 				//rigidbody.constraints = originalConstraints;
 
-				rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
+				_rigidbody.constraints = RigidbodyConstraints.None;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
 
 
 				pressCount1 = 0;
@@ -56,15 +56,15 @@ public class SetRotationAxesConstraints : MonoBehaviour {
 			//rigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
 
 			if (pressCount2 == 0) {
-				originalConstraints = rigidbody.constraints;
+//				originalConstraints = rigidbody.constraints;
 				//rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
 				pressCount2++;
 			} else {
 				//rigidbody.constraints = originalConstraints;
 				
-				rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
+				_rigidbody.constraints = RigidbodyConstraints.None;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
 				
 				
 				pressCount2 = 0;
@@ -75,15 +75,15 @@ public class SetRotationAxesConstraints : MonoBehaviour {
 			//rigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
 
 			if (pressCount3 == 0) {
-				originalConstraints = rigidbody.constraints;
+//				originalConstraints = rigidbody.constraints;
 				//rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
 				pressCount3++;
 			} else {
 				//rigidbody.constraints = originalConstraints;
 				
-				rigidbody.constraints = RigidbodyConstraints.None;
-				rigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
+				_rigidbody.constraints = RigidbodyConstraints.None;
+				_rigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
 				
 				
 				pressCount3 = 0;
@@ -91,7 +91,7 @@ public class SetRotationAxesConstraints : MonoBehaviour {
 
 		}
 		if (Input.GetKeyDown(keyResetRotationConstraint)) {
-			rigidbody.constraints = RigidbodyConstraints.None;
+			_rigidbody.constraints = RigidbodyConstraints.None;
 		}
 		
 	}
