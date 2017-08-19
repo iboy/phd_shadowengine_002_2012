@@ -31,10 +31,12 @@ public class TouchTracker : MonoBehaviour {
 	public float  	distance 	= 	0.2f;
 	public bool 	attachTouchDragsToCenterOfMass = false;
 	public Camera mainCamera;
+	public Camera mainPerspectiveCamera;
 	public float perspectiveMultiplier = 1.0f;
 
 	//static List<GameObject> controllerTouchObjects = new List<GameObject>();
 	private SpringJoint springJoint;
+	private Ray ray;
 	//int controllerTouchObjectsSize;
 
 	void Start() {
@@ -45,11 +47,8 @@ public class TouchTracker : MonoBehaviour {
 
 
 	}
-
-
-	void Update() {
 	
-
+	void Update() {
 		// Track a single touch as a direction control.
 		if (Input.touchCount > 0)
 		{
@@ -70,8 +69,7 @@ public class TouchTracker : MonoBehaviour {
 		}
 
 	}
-	
-	
+
 	void DisplayTouchPoints ( Touch touch ) {
 
 
@@ -81,19 +79,35 @@ public class TouchTracker : MonoBehaviour {
 		switch (touch.phase) {
 
 		case TouchPhase.Began:
-
 			//Debug.Log ("Handle Touch: "+touch.fingerId+" Began");
-			TouchPointSprites[touch.fingerId].SetActive(true);
+			//TouchPointSprites[touch.fingerId].SetActive(true); // moved this to start from the new position - rather than the last stored position
+			//TouchPointSprites[touch.fingerId].SetActive(true);
 			break;
 
 		case TouchPhase.Moved:
 			//Debug.Log ("Handle Touch: "+touch.fingerId+" Moved");
 
 			Vector3 touchDeltaPosition = touch.position; // remember get touch is zero indexed.
-			touchDeltaPosition = Camera.main.ScreenToWorldPoint(touchDeltaPosition);
-			TouchPointSprites[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x*perspectiveMultiplier, touchDeltaPosition.y*perspectiveMultiplier, touchOverlayZ-2);
-			break;
-			
+			// touchDeltaPosition = Camera.main.ScreenToWorldPoint(touchDeltaPosition);
+			if (mainPerspectiveCamera !=null & mainPerspectiveCamera.enabled==true) {
+				//touchDeltaPosition = mainPerspectiveCamera.ScreenToWorldPoint(touchDeltaPosition);
+
+				TouchPointSprites[touch.fingerId].SetActive(true);
+				touchDeltaPosition = GetWorldPositionOnPlane(touch.position, touchDeltaPosition.z-.14f);
+				TouchPointSprites[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x, touchDeltaPosition.y, touchDeltaPosition.z-.14f); // perspective camera mode
+
+
+			}
+
+			if (mainCamera.enabled==true) {
+				touchDeltaPosition = mainCamera.ScreenToWorldPoint(touchDeltaPosition);
+				TouchPointSprites[touch.fingerId].SetActive(true);
+				TouchPointSprites[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x*perspectiveMultiplier, touchDeltaPosition.y*perspectiveMultiplier, touchOverlayZ-2); // orthographic camera mode. TODO change the -2 to 0. But adjust all instances.
+			}
+
+
+				break;
+
 
 		case TouchPhase.Ended:
 			//Debug.Log ("Handle Touch: "+touch.fingerId+" Ended");
@@ -101,17 +115,21 @@ public class TouchTracker : MonoBehaviour {
 			break;
 		}
 	}
-
-
+	
 	void TouchToController ( Touch touch ) {
-		
-		
-		Ray ray = Camera.main.ScreenPointToRay(touch.position);
-		
+	
+		ray = mainCamera.ScreenPointToRay(touch.position);
+		if (mainPerspectiveCamera !=null & mainPerspectiveCamera.enabled==true) {
+			 ray = mainPerspectiveCamera.ScreenPointToRay(touch.position);
+		}
+
+		if ( mainCamera.enabled==true) {
+
+			 ray = mainCamera.ScreenPointToRay(touch.position);
+		}
+
 		//bool dragit = false; // flag to signal we're ready to drag...
 		RaycastHit hit = new RaycastHit();
-
-
 
 		//Debug.Log ("Handle Touch: "+touch.fingerId+" Began");
 		
@@ -122,38 +140,14 @@ public class TouchTracker : MonoBehaviour {
 			//Debug.Log ("Handle Touch: "+touch.fingerId+" Began");
 			TouchPointControllers[touch.fingerId].SetActive(true);
 
-//			int humanTouchCount = touch.fingerId+1;
-//			string rigidbodyName = "Rigidbody dragger for Touch "+humanTouchCount.ToString();
-			
-			//GameObject go = new GameObject (rigidbodyName);
-		
-			
 			//hit = new RaycastHit();
 			if (Physics.Raycast(ray, out hit)) {
 				//Debug.Log ("Touch: "+touch.fingerId+"  hit"+hit.collider.name);
-				
-				
-				
-				
+
 				if (hit.rigidbody) { // is it a rigidbody
 					
 					if(!hit.rigidbody.isKinematic) {  // is it NOT set to isKinematic? i.e not to move
 						
-						
-						
-						// float oldAngularDrag;
-						
-						//Debug.Log ("Touch: "+touch.fingerId+"  hit"+hit.collider.name);
-						
-						//dragit = true;
-						
-
-						
-						
-						
-						//Rigidbody body = controllerTouchObjects[touch.fingerId].AddComponent ("Rigidbody") as Rigidbody;
-						//	 springJoint = TouchPointControllers[touch.fingerId].AddComponent ("SpringJoint") as SpringJoint;
-						//body.isKinematic = true;
 
 						springJoint = TouchPointControllers[touch.fingerId].GetComponent<SpringJoint>();
 						springJoint.transform.position = hit.point;
@@ -196,10 +190,27 @@ public class TouchTracker : MonoBehaviour {
 			
 		case TouchPhase.Moved:
 			//Debug.Log ("Handle Touch: "+touch.fingerId+" Moved");
-			
+
 			Vector3 touchDeltaPosition = touch.position; // remember get touch is zero indexed.
-			touchDeltaPosition = Camera.main.ScreenToWorldPoint(touchDeltaPosition);
-			TouchPointControllers[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x*perspectiveMultiplier, touchDeltaPosition.y*perspectiveMultiplier, TouchPointControllers[touch.fingerId].transform.position.z);
+			//touchDeltaPosition = Camera.main.ScreenToWorldPoint(touchDeltaPosition);
+
+
+
+			if ( mainCamera.enabled==true) {
+				//TouchPointControllers[touch.fingerId].SetActive(true);
+				touchDeltaPosition = mainCamera.ScreenToWorldPoint(touchDeltaPosition);
+				TouchPointControllers[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x*perspectiveMultiplier, touchDeltaPosition.y*perspectiveMultiplier, TouchPointControllers[touch.fingerId].transform.position.z);
+
+			}
+
+			if (mainPerspectiveCamera !=null & mainPerspectiveCamera.enabled==true) {
+				//TouchPointControllers[touch.fingerId].SetActive(true);
+				perspectiveMultiplier = 1.0f;
+				touchDeltaPosition = GetWorldPositionOnPlane(touch.position, 0);
+				TouchPointControllers[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x*perspectiveMultiplier, touchDeltaPosition.y*perspectiveMultiplier,TouchPointControllers[touch.fingerId].transform.position.z);
+
+			} 
+
 			break;
 			
 			
@@ -213,209 +224,25 @@ public class TouchTracker : MonoBehaviour {
 		}
 	}
 
-	//IEnumerator DragObject(float distance, Touch touch, bool dragit) {
-	//
-	//	//Debug.Log ("Here we go!");
-	//
-	//
-	//	float oldDrag = springJoint.connectedBody.drag;
-	//	float oldAngularDrag = springJoint.connectedBody.angularDrag;
-	//	springJoint.connectedBody.drag = drag;
-	//	springJoint.connectedBody.angularDrag = angularDrag;
-	//
-	//	while (touch.phase != TouchPhase.Stationary || touch.phase != TouchPhase.Ended ) // controls when we exit the co-routine.
-	//	{
-	//
-	//		//Debug.Log("We're in the coroutine");
-	//
-	//		Vector3 touchWorldPosition = touch.position;
-	//		touchWorldPosition = mainCamera.ScreenToWorldPoint(touchWorldPosition);
-	//		Ray ray = mainCamera.ScreenPointToRay(touchWorldPosition);
-	//
-	//		//touchWorldPosition = Camera.main.ScreenToWorldPoint(touchWorldPosition);
-	//		//springJoint.transform.position = ray.GetPoint(distance);
-	//
-	//		//springJoint.transform.position = touchWorldPosition;
-	//		//Debug.Log("Touch X "+ touchWorldPosition.x +"Touch Y "+ touchWorldPosition.y +"Touch Z "+ touchWorldPosition.z);
-	//		//instead of moving the springjoint - move the gameobject
-	//
-	//
-	//		//TouchPointSprites[touch.fingerId].transform.position = new Vector3(touchDeltaPosition.x, touchDeltaPosition.y, touchOverlayZ);
-	//
-	//		yield return null;
-	//
-	//	}
-	//	if (springJoint.connectedBody)
-	//	{
-	//		springJoint.connectedBody.drag = oldDrag;
-	//		springJoint.connectedBody.angularDrag = oldAngularDrag;
-	//		springJoint.connectedBody = null;
-	//		Debug.Log("Stopped moving in the coroutine.");
-	//		//dragit = false;
-	//		//if (go) { Destroy(go); }
-	//
-	//
-	//
-	//	}
-	//
-	//}
+	// this function corrects the ray values for the perspective camera with real wild settings. All movement was constrianed
+	// to the middle of the screen, with no left and right movment at all.
+	/*
+	 * When using a perspective camera, changing the Z position actually changes where the object appears on the screen. 
+	 * Think of it this way, in perspective camera, the farther the object is, the more it appears to be in the middle, 
+	 * even if the X and Y remain the same. The closer it gets, the more it moves to the side, until it gets close enough 
+	 * to pass to your left or right.
+	 * http://answers.unity3d.com/questions/566519/camerascreentoworldpoint-in-perspective.html
+	*/
 
-	
-	
-	
-	
-//	void DragrigidbodyWithTouch ( Touch touch ) {
-//	
-//		// this should run for every touch so somehow get a new id on the game object for every one!
-//
-//		//int humanTouchCount = touch.fingerId+1;
-//		//string rigidbodyName = "Rigidbody dragger for Touch "+humanTouchCount.ToString();
-//	
-//		Ray ray = Camera.main.ScreenPointToRay(touch.position);
-//	
-//		bool dragit = false; // flag to signal we're ready to drag...
-//		RaycastHit hit = new RaycastHit();
-//		//GameObject go;
-//		switch (touch.phase) {
-//	
-//		case TouchPhase.Began:
-//			//RaycastHit hit = new RaycastHit();
-//			//Debug.Log ("Handle Touch: "+touch.fingerId+" Began");
-//			int humanTouchCount = touch.fingerId+1;
-//			string rigidbodyName = "Rigidbody dragger for Touch "+humanTouchCount.ToString();
-//
-//			//GameObject go = new GameObject (rigidbodyName);
-//			controllerTouchObjects.Insert (touch.fingerId, new GameObject (rigidbodyName));
-//
-//	
-//			controllerTouchObjectsSize = controllerTouchObjects.Count;
-//			Debug.Log("In TOUCH BEGAN: "+controllerTouchObjectsSize);
-//
-//
-//
-//			//hit = new RaycastHit();
-//			if (Physics.Raycast(ray, out hit)) {
-//				//Debug.Log ("Touch: "+touch.fingerId+"  hit"+hit.collider.name);
-//
-//
-//			
-//
-//			if (hit.rigidbody) { // is it a rigidbody
-//
-//				if(!hit.rigidbody.isKinematic) {  // is it NOT set to isKinematic? i.e not to move
-//		
-//
-//				
-//					float oldAngularDrag;
-//
-//					//Debug.Log ("Touch: "+touch.fingerId+"  hit"+hit.collider.name);
-//
-//					dragit = true;
-//					
-//					//if (!springJoint) {
-//
-//
-//
-//							Rigidbody body = controllerTouchObjects[touch.fingerId].AddComponent ("Rigidbody") as Rigidbody;
-//							SpringJoint springJoint = controllerTouchObjects[touch.fingerId].AddComponent ("SpringJoint") as SpringJoint;
-//							body.isKinematic = true;
-//					//	}
-//
-//						springJoint.transform.position = hit.point;
-//
-//					// check where the anchor is supposed to go
-//					if (attachTouchDragsToCenterOfMass) {
-//						
-//							// check these values
-//							Vector3 anchor = transform.TransformDirection(hit.rigidbody.centerOfMass) + hit.rigidbody.transform.position;
-//							anchor = springJoint.transform.InverseTransformPoint(anchor);
-//							//anchor = springJoint.transform.TransformPoint(anchor);
-//							springJoint.anchor = anchor;
-//
-//					} else {
-//							springJoint.anchor = Vector3.zero;
-//					}
-//
-//					// set spring settings
-//						springJoint.spring = spring;
-//						springJoint.damper = damper;
-//						springJoint.maxDistance = distance;
-//						springJoint.connectedBody = hit.rigidbody;
-//
-//					//StartCoroutine (DragObject( hit.distance, touch, dragit));
-//
-//					} // end of kinematic test
-//			
-//				} // end of rigid body test
-//
-//			} // end of first hit test
-//
-//			else {
-//
-//				//if (springJoint.connectedBody) { Destroy(springJoint.gameObject); } // destroys the object if it was connected to a kinematic rigidbody
-//
-//			}
-//
-//
-//			break;
-//		case TouchPhase.Moved:
-//			if (dragit == true) {
-//			dragit = true;
-//			Vector3 touchWorldPosition = touch.position;
-//			touchWorldPosition = mainCamera.ScreenToWorldPoint(touchWorldPosition);
-//			//Ray ray = mainCamera.ScreenPointToRay(touchWorldPosition);
-//			//Debug.Log("Touch X "+ touchWorldPosition.x +"Touch Y "+ touchWorldPosition.y);
-//
-//			
-//				float oldDrag = springJoint.connectedBody.drag;
-//				float oldAngularDrag = springJoint.connectedBody.angularDrag;
-//				springJoint.connectedBody.drag = drag;
-//				springJoint.connectedBody.angularDrag = angularDrag;
-//
-//			// go isn't in scope...
-//			// find it - this works
-//				springJoint.gameObject.transform.position = new Vector3(touchWorldPosition.x, touchWorldPosition.y, touchOverlayZ);
-//
-//			//Vector3 touchWorldPosition = touch.position;
-//			//touchWorldPosition = mainCamera.ScreenToWorldPoint(touchWorldPosition);
-//			//Ray ray = mainCamera.ScreenPointToRay(touchWorldPosition);
-//			}
-//
-//			break;
-//		case TouchPhase.Stationary:
-//			break;
-//
-//		case TouchPhase.Ended:
-//
-//
-//			if (dragit == true) {
-//				if (springJoint.connectedBody) {
-//
-//					float oldDrag = springJoint.connectedBody.drag;
-//					float oldAngularDrag = springJoint.connectedBody.angularDrag;
-//					springJoint.connectedBody.drag = oldDrag;
-//					springJoint.connectedBody.angularDrag = oldAngularDrag;
-//					springJoint.connectedBody = null;
-//					//Destroy(springJoint.gameObject);
-//					//Debug.Log("Stopped moving in the coroutine.");
-//					//dragit = false;
-//					//if (go) { Destroy(go); }
-//				
-//				
-//				}
-//			//if (go) { Destroy(go); }
-//			//if (dragit == true) { Destroy(springJoint.gameObject); dragit = false;}
-//			}
-//
-//			controllerTouchObjects.RemoveAt (touch.fingerId);
-//			controllerTouchObjectsSize = controllerTouchObjects.Count;
-//			Debug.Log("In TOUCH END: "+controllerTouchObjectsSize);
-//			break;
-//		} // end of switch
-//
-//
-//
-//	}
-	
+	public Vector3 GetWorldPositionOnPlane(Vector3 screenPosition, float z) {
+		Ray ray2 = mainPerspectiveCamera.ScreenPointToRay(screenPosition);
+
+		Plane xy = new Plane(Vector3.forward, new Vector3(0, 0, z));
+		float distance;
+		xy.Raycast(ray2, out distance);
+		return ray.GetPoint(distance);
+
+	}
+
 	
 }

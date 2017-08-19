@@ -12,6 +12,7 @@ public class ToggleCamera : MonoBehaviour {
 	public KeyCode dofToggleKey = KeyCode.D;
 	public KeyCode vignetteToggleKey = KeyCode.BackQuote;
 	public KeyCode blurToggleKey = KeyCode.Backslash;
+	public KeyCode antialiasingToggleKey = KeyCode.Semicolon;
 
 	
 
@@ -36,7 +37,7 @@ public class ToggleCamera : MonoBehaviour {
 			
 				if (perspectiveCamera.enabled) {
 					if (touchTracker != null) {		
-						touchTracker.displayTouchPointsSwitch = false;	
+						touchTracker.displayTouchPointsSwitch = true;	// this is trying to fix the issue with the touch track in perspective space... it turns off the touch indicator.
 					}
 			
 				}
@@ -47,6 +48,7 @@ public class ToggleCamera : MonoBehaviour {
 					}
 				}
 			}
+		}
 	
 		if (Input.GetKeyDown(dofToggleKey)) {
 				if (perspectiveCamera != null) {
@@ -54,7 +56,8 @@ public class ToggleCamera : MonoBehaviour {
 					dof.enabled = !dof.enabled;
 				}
 			}
-		}
+
+		
 
 		if (Input.GetKeyDown(blurToggleKey)) {
 			
@@ -69,6 +72,23 @@ public class ToggleCamera : MonoBehaviour {
 					Blur blp = perspectiveCamera.gameObject.GetComponent<Blur>();
 					blp.enabled = !blp.enabled;
 				
+				}
+			}
+		}
+
+		if (Input.GetKeyDown(antialiasingToggleKey)) {
+			
+			if (orthographicCamera.enabled) {
+				AntialiasingAsPostEffect aao = orthographicCamera.gameObject.GetComponent<AntialiasingAsPostEffect>();
+				aao.enabled = !aao.enabled;
+				
+			}
+			
+			if (perspectiveCamera != null) {
+				if (perspectiveCamera.enabled) {
+					AntialiasingAsPostEffect aap = perspectiveCamera.gameObject.GetComponent<AntialiasingAsPostEffect>();
+					aap.enabled = !aap.enabled;
+					
 				}
 			}
 		}
